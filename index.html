@@ -183,6 +183,46 @@ section{padding:140px 0;position:relative}
 footer{border-top:1px solid var(--line);padding:30px 0;font-size:13px;color:var(--muted)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
+
+/* Menü-Knopf + Handy-Menü */
+.burger{display:none;width:46px;height:46px;border:1px solid var(--line);background:transparent;cursor:pointer;position:relative;z-index:41}
+.burger i{position:absolute;left:12px;right:12px;height:2px;background:#fff;transition:transform .3s,top .3s}
+.burger i:first-child{top:17px}.burger i:last-child{top:27px}
+.menu-open .burger i:first-child{top:22px;transform:rotate(45deg)}
+.menu-open .burger i:last-child{top:22px;transform:rotate(-45deg)}
+.mmenu{position:fixed;inset:0;z-index:40;background:#07080a;display:flex;flex-direction:column;justify-content:center;padding:100px 28px 40px;opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s}
+.menu-open .mmenu{opacity:1;visibility:visible}
+.mmenu a.m{font-size:30px;font-weight:600;color:#fff;padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.mmenu a.m small{font:12px Consolas,monospace;color:var(--red);letter-spacing:.2em}
+.mmenu .mc{margin-top:36px;display:grid;gap:12px}
+.mmenu .mc a{color:var(--muted);font-size:16px}
+.menu-open{overflow:hidden}
+.menu-open .nav{z-index:50;background:transparent!important;border-color:transparent!important;backdrop-filter:none!important}
+/* Anruf-Leiste auf dem Handy */
+.callbar{display:none}
+@media (max-width:1000px){
+  .burger{display:block}
+  .nav .btn.sand{display:none}
+  .reveal-img{aspect-ratio:4/3}
+  .hero{height:100svh}
+}
+@media (max-width:620px){
+  .callbar{display:grid;grid-template-columns:1fr 1fr;position:fixed;left:0;right:0;bottom:0;z-index:35;background:rgba(7,8,10,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));gap:10px;transform:translateY(110%);transition:transform .35s}
+  .callbar.show{transform:none}
+  .callbar a{height:46px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .callbar a.c1{background:var(--sand);color:#0b0b0b}
+  .callbar a.c2{border:1px solid rgba(255,255,255,.3);color:#fff}
+  footer{padding-bottom:90px}
+  .hero .label{font-size:10px;letter-spacing:.2em}
+  .hero .label::before{width:22px}
+  .intro{margin-bottom:44px}
+  h2{margin:14px 0 16px}
+}
+@media (min-width:1700px){
+  .wrap{max-width:1440px}
+  .hero h1{font-size:96px}
+}
+
 /* Einblenden */
 .js .rv{opacity:0;transform:translateY(30px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.8,.2,1)}
 .js .rv.in{opacity:1;transform:none}
@@ -242,8 +282,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <li><a href="#zulassung">Zulassung</a></li>
     </ul>
     <a class="btn sand" href="#kontakt">Kontakt</a>
+    <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false"><i></i><i></i></button>
   </div>
 </header>
+
+<nav class="mmenu" id="mmenu" aria-label="Menü">
+  <a class="m" href="#leistungen">Leistungen <small>01</small></a>
+  <a class="m" href="#jugendhilfe">Jugendhilfe <small>02</small></a>
+  <a class="m" href="#ablauf">Ablauf <small>03</small></a>
+  <a class="m" href="#zulassung">Zulassung <small>04</small></a>
+  <a class="m" href="#kontakt">Kontakt <small>05</small></a>
+  <div class="mc"><a href="tel:+491776729275">0177 6729275</a><a href="mailto:kontakt@aksdienst.de">kontakt@aksdienst.de</a></div>
+</nav>
 
 <main id="top">
 
@@ -399,6 +449,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 </main>
 
+<div class="callbar" id="callbar">
+  <a class="c1" href="tel:+491776729275">Anrufen</a>
+  <a class="c2" href="mailto:kontakt@aksdienst.de">E-Mail</a>
+</div>
+
 <footer>
   <div class="wrap">
     <span>© 2026 AKS Allgemeiner Kontroll- und Sicherheitsdienst UG (haftungsbeschränkt)</span>
@@ -416,6 +471,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       var r = b.parentNode.getBoundingClientRect(), lim = r.height * 0.17, y = Math.max(-lim, Math.min(lim, (r.top + r.height/2 - innerHeight/2) * -0.2)); b.style.transform = 'translateY(' + y + 'px)'; }
   }
   addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* Handy-Menü */
+  var burger = document.getElementById('burger'), root = document.documentElement;
+  function menu(open){ root.classList.toggle('menu-open', open); burger.setAttribute('aria-expanded', open); burger.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen'); }
+  burger.addEventListener('click', function(){ menu(!root.classList.contains('menu-open')); });
+  document.querySelectorAll('#mmenu a').forEach(function(a){ a.addEventListener('click', function(){ menu(false); }); });
+  addEventListener('keydown', function(e){ if(e.key === 'Escape') menu(false); });
+
+  /* Anruf-Leiste erst nach dem Kopfbereich zeigen */
+  var cb = document.getElementById('callbar');
+  addEventListener('scroll', function(){ cb.classList.toggle('show', scrollY > innerHeight*0.7); }, {passive:true});
 
   /* Einblenden beim Scrollen */
   var io = new IntersectionObserver(function(es){
